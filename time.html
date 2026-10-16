@@ -192,12 +192,18 @@
     const error = document.getElementById('error');
     const answer = document.getElementById('answer');
     const latestTime = document.getElementById('latestTime');
-    const storageKey = 'date-invite-latest-time';
 
-    function loadLatestTime() {
-      const time = localStorage.getItem(storageKey);
-      latestTime.textContent = time || '暂未选择';
-      answer.textContent = time ? `她选择了 ${time}，记得准时赴约 ♡` : '';
+    async function loadLatestTime() {
+      try {
+        const response = await fetch('/api/time', { cache: 'no-store' });
+        if (!response.ok) throw new Error('load failed');
+        const result = await response.json();
+        latestTime.textContent = result.time || '暂未选择';
+        answer.textContent = result.time ? `她选择了 ${result.time}，记得准时赴约 ♡` : '';
+      } catch (loadError) {
+        latestTime.textContent = '暂时无法读取';
+        answer.textContent = '请确认网页服务器正在运行。';
+      }
     }
 
     keyForm.addEventListener('submit', (event) => {
