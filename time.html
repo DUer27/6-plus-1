@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffe8f1" />
+  <title>6+1 小姐的见面时间</title>
+  <style>
+    :root {
+      --pink: #ff6f9f;
+      --deep-pink: #e9497e;
+      --ink: #5c3048;
+      --muted: #a66f88;
+      --shadow: 0 24px 70px rgba(183, 78, 126, .22);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fff4f8;
+      font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    button, input { font: inherit; }
+    .page {
+      position: relative;
+      display: grid;
+      min-height: 100svh;
+      place-items: center;
+      overflow: hidden;
+      padding: 22px 16px;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 12% 14%, rgba(255,255,255,.95) 0 1px, transparent 2px),
+        radial-gradient(circle at 86% 26%, rgba(255,255,255,.8) 0 1.5px, transparent 2.5px),
+        linear-gradient(145deg, #ffeaf2 0%, #fff7f4 48%, #f8e7ff 100%);
+      background-size: 170px 170px, 230px 230px, auto;
+    }
+
+    .page::before,
+    .page::after {
+      position: absolute;
+      z-index: -1;
+      width: min(65vw, 520px);
+      height: min(65vw, 520px);
+      border-radius: 50%;
+      content: "";
+      filter: blur(2px);
+      pointer-events: none;
+    }
+    .page::before { top: -22%; right: -18%; background: rgba(255,179,208,.3); }
+    .page::after { bottom: -22%; left: -18%; background: rgba(197,165,255,.22); }
+
+    .sparkles { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+    .sparkles span { position: absolute; color: rgba(255,255,255,.9); animation: twinkle 2.8s ease-in-out infinite; }
+    .sparkles span:nth-child(1) { top: 14%; left: 13%; font-size: 18px; }
+    .sparkles span:nth-child(2) { top: 24%; right: 14%; font-size: 13px; animation-delay: .8s; }
+    .sparkles span:nth-child(3) { bottom: 18%; left: 17%; font-size: 12px; animation-delay: 1.4s; }
+    .sparkles span:nth-child(4) { right: 11%; bottom: 15%; font-size: 18px; animation-delay: 1.9s; }
+
+    .card {
+      width: min(100%, 570px);
+      padding: clamp(31px, 7vw, 61px) clamp(20px, 7vw, 65px) 35px;
+      border: 1px solid rgba(255,255,255,.8);
+      border-radius: 38px;
+      background: rgba(255,252,252,.78);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.9);
+      text-align: center;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      animation: card-in .8s cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    .locked .invite { display: none; }
+    .locked .lock { display: block; }
+    .lock { display: none; }
+
+    .icon { margin: 0 auto 17px; font-size: 53px; animation: float 3.4s ease-in-out infinite; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 20px;
+      padding: 9px 16px;
+      border: 1px solid rgba(233,73,126,.14);
+      border-radius: 99px;
+      color: var(--deep-pink);
+      background: rgba(255,232,241,.72);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .14em;
+    }
+    .pill::before { content: "✦"; font-size: 10px; }
+
+    h1, h2 { margin: 0; letter-spacing: -.06em; line-height: 1.3; }
+    h1 { font-size: clamp(29px, 6vw, 45px); }
+    h2 { color: var(--deep-pink); font-size: clamp(30px, 7vw, 48px); }
+    .copy { margin: 14px auto 25px; color: var(--muted); font-size: 15px; line-height: 1.85; }
+
+    .key-form { display: flex; flex-direction: column; align-items: center; gap: 11px; }
+    .key-input {
+      width: min(100%, 245px);
+      padding: 14px 18px;
+      border: 1px solid rgba(233,73,126,.2);
+      border-radius: 99px;
+      outline: none;
+      color: var(--ink);
+      background: rgba(255,255,255,.9);
+      text-align: center;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: .28em;
+    }
+    .key-input:focus { border-color: var(--pink); box-shadow: 0 0 0 4px rgba(255,111,159,.15); }
+    .key-input.wrong { animation: shake .35s ease; border-color: var(--deep-pink); }
+    .key-button, .time-button {
+      border: 0;
+      border-radius: 99px;
+      color: #fff;
+      background: linear-gradient(135deg, #ff8eb5, #ee4e88);
+      box-shadow: 0 12px 24px rgba(233,73,126,.24);
+      cursor: pointer;
+      font-weight: 800;
+      letter-spacing: .08em;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .key-button { width: min(100%, 245px); padding: 14px 22px; font-size: 15px; }
+    .key-button:hover, .time-button:hover { transform: translateY(-3px); box-shadow: 0 16px 28px rgba(233,73,126,.28); }
+    .error { min-height: 20px; margin: 0; color: var(--deep-pink); font-size: 12px; }
+
+    .time-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 25px auto 22px; }
+    .time-button { padding: 17px 12px; font-size: 18px; }
+    .time-button.selected { outline: 4px solid rgba(233,73,126,.16); outline-offset: 3px; }
+    .answer { min-height: 23px; margin: 0; color: var(--deep-pink); font-size: 14px; font-weight: 700; }
+    .latest-result { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin: 0 auto 13px; padding: 15px 17px; border: 1px solid rgba(233,73,126,.13); border-radius: 19px; background: rgba(255,240,245,.72); text-align: left; }
+    .latest-label { color: var(--muted); font-size: 12px; }
+    .latest-result strong { color: var(--deep-pink); font-size: 19px; }
+    .footer { margin: 28px 0 0; color: rgba(166,111,136,.78); font-size: 12px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+
+    @keyframes card-in { from { opacity: 0; transform: translateY(22px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes float { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-8px) rotate(4deg); } }
+    @keyframes twinkle { 0%,100% { opacity: .25; transform: scale(.7) rotate(0); } 50% { opacity: 1; transform: scale(1.25) rotate(18deg); } }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }
+
+    @media (max-width: 430px) {
+      .card { border-radius: 30px; padding: 29px 17px 27px; }
+      .time-grid { gap: 9px; }
+      .time-button { padding: 15px 8px; font-size: 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page locked" id="page">
+    <div class="sparkles" aria-hidden="true"><span>✦</span><span>✧</span><span>✦</span><span>✧</span></div>
+    <section class="card lock" id="lockCard" aria-labelledby="lockTitle">
+      <div class="icon" aria-hidden="true">💌</div>
+      <div class="pill">PRIVATE QUESTION</div>
+      <h1 id="lockTitle">给 6+1 小姐的小问题</h1>
+      <p class="copy">请输入密钥，看看今天的见面时间～</p>
+      <form class="key-form" id="keyForm">
+        <label class="sr-only" for="keyInput">密钥</label>
+        <input class="key-input" id="keyInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="· · · ·" required />
+        <button class="key-button" type="submit">打开</button>
+        <p class="error" id="error" role="alert"></p>
+      </form>
+    </section>
+
+    <section class="card invite" id="inviteCard" aria-live="polite">
+      <div class="icon" aria-hidden="true">🕒</div>
+      <div class="pill">LATEST ANSWER</div>
+      <h2>6+1 小姐<br />选择的见面时间</h2>
+      <p class="copy">这里显示她最近一次提交的选择。</p>
+      <div class="latest-result" id="latestResult" aria-live="polite">
+        <span class="latest-label">她的最新选择</span>
+        <strong id="latestTime">暂未选择</strong>
+      </div>
+      <p class="answer" id="answer"></p>
+      <p class="footer">♡ 结果会随着她下一次提交自动更新 ♡</p>
+    </section>
+  </main>
+
+  <script>
+    const page = document.getElementById('page');
+    const keyForm = document.getElementById('keyForm');
+    const keyInput = document.getElementById('keyInput');
+    const error = document.getElementById('error');
+    const answer = document.getElementById('answer');
+    const latestTime = document.getElementById('latestTime');
+    const storageKey = 'date-invite-latest-time';
+
+    function loadLatestTime() {
+      const time = localStorage.getItem(storageKey);
+      latestTime.textContent = time || '暂未选择';
+      answer.textContent = time ? `她选择了 ${time}，记得准时赴约 ♡` : '';
+    }
+
+    keyForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (keyInput.value === '2552') {
+        page.classList.remove('locked');
+        keyInput.value = '';
+        error.textContent = '';
+        loadLatestTime();
+      } else {
+        error.textContent = '密钥不对哦，再想想～';
+        keyInput.classList.remove('wrong');
+        void keyInput.offsetWidth;
+        keyInput.classList.add('wrong');
+        keyInput.select();
+      }
+    });
+  </script>
+</body>
+</html>
