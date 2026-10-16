@@ -401,6 +401,10 @@
 
     keyForm.addEventListener('submit', (event) => {
       event.preventDefault();
+      if (keyInput.value === '2552') {
+        window.location.href = 'time.html';
+        return;
+      }
       if (keyInput.value === '2727') {
         pageRoot.classList.remove('is-locked');
         keyError.textContent = '';
