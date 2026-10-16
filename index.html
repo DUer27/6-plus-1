@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffe4ef" />
+  <title>给 6+1 小姐的约会邀请</title>
+  <style>
+    :root {
+      --pink: #ff6f9f;
+      --deep-pink: #e9497e;
+      --rose: #ffb1ca;
+      --cream: #fffaf7;
+      --ink: #5c3048;
+      --muted: #a66f88;
+      --shadow: 0 24px 70px rgba(183, 78, 126, .22);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background: #fff4f8;
+      font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    button { font: inherit; }
+
+    .page {
+      position: relative;
+      display: grid;
+      min-height: 100svh;
+      place-items: center;
+      isolation: isolate;
+      overflow: hidden;
+      padding: 28px 18px;
+      background:
+        radial-gradient(circle at 12% 14%, rgba(255,255,255,.95) 0 1px, transparent 2px),
+        radial-gradient(circle at 86% 26%, rgba(255,255,255,.8) 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 72% 80%, rgba(255,255,255,.8) 0 1px, transparent 2px),
+        linear-gradient(145deg, #ffeaf2 0%, #fff7f4 48%, #f8e7ff 100%);
+      background-size: 170px 170px, 230px 230px, 190px 190px, auto;
+    }
+
+    .page::before,
+    .page::after {
+      position: absolute;
+      z-index: -1;
+      display: block;
+      border-radius: 50%;
+      content: "";
+      filter: blur(2px);
+      pointer-events: none;
+    }
+
+    .page::before {
+      width: min(75vw, 560px);
+      height: min(75vw, 560px);
+      top: -21%;
+      right: -18%;
+      background: rgba(255, 179, 208, .3);
+      box-shadow: 0 0 100px rgba(255, 164, 202, .25);
+    }
+
+    .page::after {
+      width: min(58vw, 430px);
+      height: min(58vw, 430px);
+      bottom: -20%;
+      left: -15%;
+      background: rgba(197, 165, 255, .22);
+      box-shadow: 0 0 100px rgba(209, 172, 255, .2);
+    }
+
+    .sparkles { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+    .sparkles span { position: absolute; color: rgba(255,255,255,.85); font-size: 18px; animation: twinkle 2.8s ease-in-out infinite; }
+    .sparkles span:nth-child(1) { top: 13%; left: 12%; }
+    .sparkles span:nth-child(2) { top: 23%; right: 14%; font-size: 13px; animation-delay: .8s; }
+    .sparkles span:nth-child(3) { bottom: 19%; left: 17%; font-size: 12px; animation-delay: 1.4s; }
+    .sparkles span:nth-child(4) { right: 11%; bottom: 14%; animation-delay: 1.9s; }
+    .sparkles span:nth-child(5) { top: 8%; left: 47%; font-size: 11px; animation-delay: .4s; }
+
+    .invite-card {
+      position: relative;
+      width: min(100%, 670px);
+      padding: clamp(30px, 7vw, 64px) clamp(22px, 7vw, 70px) 36px;
+      border: 1px solid rgba(255,255,255,.8);
+      border-radius: 38px;
+      background: rgba(255, 252, 252, .76);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.9);
+      text-align: center;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      animation: card-in .85s cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    .date-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 22px;
+      padding: 9px 17px;
+      border: 1px solid rgba(233, 73, 126, .14);
+      border-radius: 99px;
+      color: var(--deep-pink);
+      background: rgba(255, 232, 241, .72);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .14em;
+    }
+
+    .date-pill::before { content: "✦"; font-size: 11px; }
+
+    .heart {
+      width: 73px;
+      height: 73px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 21px;
+      border-radius: 28px;
+      color: white;
+      background: linear-gradient(145deg, #ff9fc0, #f05a91);
+      box-shadow: 0 14px 28px rgba(239, 86, 143, .28);
+      font-size: 34px;
+      animation: heart-float 3.4s ease-in-out infinite;
+    }
+
+    h1 {
+      max-width: 520px;
+      margin: 0 auto 14px;
+      color: var(--ink);
+      font-size: clamp(29px, 6vw, 50px);
+      font-weight: 800;
+      letter-spacing: -.055em;
+      line-height: 1.25;
+    }
+
+    h1 em {
+      color: var(--deep-pink);
+      font-style: normal;
+      text-shadow: 0 4px 16px rgba(233, 73, 126, .13);
+    }
+
+    .subtitle {
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: clamp(14px, 2.7vw, 16px);
+      letter-spacing: .04em;
+      line-height: 1.8;
+    }
+
+    .choice-area {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(10px, 3vw, 22px);
+      min-height: 132px;
+      margin: 22px auto 5px;
+      isolation: isolate;
+    }
+
+    .choice {
+      position: relative;
+      min-width: 142px;
+      padding: 14px 24px;
+      border: 0;
+      border-radius: 99px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      transition: transform .25s ease, box-shadow .25s ease, opacity .25s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .choice:focus-visible { outline: 3px solid rgba(233,73,126,.35); outline-offset: 4px; }
+
+    .choice-yes {
+      z-index: 1;
+      color: var(--deep-pink);
+      border: 1px solid rgba(233,73,126,.17);
+      background: rgba(255,255,255,.84);
+      box-shadow: 0 10px 23px rgba(167, 92, 124, .12);
+    }
+
+    .choice-must {
+      z-index: 2;
+      color: #fff;
+      background: linear-gradient(135deg, #ff8eb5, #ee4e88);
+      box-shadow: 0 12px 24px rgba(233, 73, 126, .27);
+      transform-origin: center;
+    }
+
+    .choice:hover { transform: translateY(-3px); }
+    .choice-must:hover { transform: translateY(-3px) scale(var(--must-scale, 1)); }
+
+    .hint {
+      min-height: 20px;
+      margin: 0;
+      color: #c0849c;
+      font-size: 12px;
+      letter-spacing: .05em;
+      transition: opacity .25s ease;
+    }
+
+    .footer-note {
+      margin: 27px 0 0;
+      color: rgba(166,111,136,.78);
+      font-size: 12px;
+    }
+
+    .success {
+      display: none;
+      animation: success-in .7s cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    .success.is-visible { display: block; }
+    .invite-card.is-success .invite-content { display: none; }
+    .invite-card.is-success .success { display: block; }
+
+    .success h2 { margin: 0 0 12px; color: var(--deep-pink); font-size: clamp(31px, 7vw, 52px); letter-spacing: -.06em; }
+    .success p { margin: 0 auto 26px; color: var(--muted); font-size: 16px; line-height: 1.9; }
+    .success-date { display: inline-block; margin-bottom: 24px; padding: 13px 21px; border-radius: 18px; color: var(--deep-pink); background: #fff0f5; font-size: 20px; font-weight: 800; }
+    .success-heart { font-size: 55px; animation: heart-beat 1.1s ease-in-out infinite; }
+    .flow-page {
+      display: none;
+      animation: success-in .7s cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    .invite-card.is-flow .invite-content { display: none; }
+    .invite-card.is-flow .flow-page.active { display: block; }
+
+    .flow-kicker { margin: 0 0 12px; color: var(--deep-pink); font-size: 12px; font-weight: 800; letter-spacing: .18em; }
+    .flow-title { margin: 0 auto 12px; color: var(--ink); font-size: clamp(28px, 6vw, 43px); letter-spacing: -.06em; line-height: 1.3; }
+    .flow-copy { margin: 0 auto 24px; color: var(--muted); font-size: 15px; line-height: 1.8; }
+
+    .option-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 0 auto 24px; }
+    .time-option,
+    .activity-option { border: 1px solid rgba(233,73,126,.15); border-radius: 18px; color: var(--deep-pink); background: rgba(255,255,255,.72); cursor: pointer; font-weight: 800; transition: transform .2s ease, color .2s ease, background .2s ease, box-shadow .2s ease; -webkit-tap-highlight-color: transparent; }
+    .time-option { padding: 15px 7px; font-size: 15px; }
+    .time-option:hover, .activity-option:hover { transform: translateY(-3px); }
+    .time-option.selected, .activity-option.selected { color: #fff; border-color: transparent; background: linear-gradient(135deg, #ff8eb5, #ee4e88); box-shadow: 0 10px 22px rgba(233,73,126,.22); }
+
+    .activity-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 11px; margin: 0 auto 24px; }
+    .activity-option { display: flex; align-items: center; gap: 9px; min-height: 56px; padding: 12px 14px; text-align: left; font-size: 14px; }
+    .activity-option input { position: absolute; opacity: 0; pointer-events: none; }
+    .activity-option .check { display: grid; width: 22px; height: 22px; flex: 0 0 22px; place-items: center; border: 1px solid rgba(233,73,126,.22); border-radius: 50%; background: #fff; color: transparent; font-size: 13px; }
+    .activity-option.selected .check { color: var(--deep-pink); background: #fff; }
+
+    .flow-button { width: min(100%, 270px); padding: 14px 22px; border: 0; border-radius: 99px; color: #fff; background: linear-gradient(135deg, #ff8eb5, #ee4e88); box-shadow: 0 12px 24px rgba(233,73,126,.24); cursor: pointer; font-size: 15px; font-weight: 800; letter-spacing: .08em; transition: transform .2s ease, opacity .2s ease, box-shadow .2s ease; }
+    .flow-button:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 16px 28px rgba(233,73,126,.28); }
+    .flow-button:disabled { cursor: not-allowed; opacity: .45; box-shadow: none; }
+    .selected-time { display: inline-block; margin: -8px 0 20px; padding: 8px 14px; border-radius: 99px; color: var(--deep-pink); background: #fff0f5; font-size: 13px; font-weight: 700; }
+    .final-heart { margin-bottom: 18px; font-size: 62px; animation: heart-beat 1.1s ease-in-out infinite; }
+    .final-title { font-size: clamp(34px, 8vw, 58px); }
+    .final-copy { font-size: 17px; }
+    .flow-button.secondary { margin-top: 12px; color: var(--deep-pink); border: 1px solid rgba(233,73,126,.15); background: rgba(255,255,255,.8); box-shadow: none; }
+
+    @media (max-width: 480px) {
+      .option-grid { gap: 7px; }
+      .time-option { padding: 14px 3px; font-size: 13px; }
+      .activity-grid { gap: 8px; }
+      .activity-option { min-height: 53px; padding: 10px 9px; font-size: 13px; }
+    }
+    .page.is-locked .invite-card { display: none; }
+    .lock-card { position: relative; width: min(100%, 520px); padding: clamp(32px, 7vw, 58px) clamp(22px, 7vw, 60px); border: 1px solid rgba(255,255,255,.8); border-radius: 38px; background: rgba(255,252,252,.78); box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.9); text-align: center; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); animation: card-in .85s cubic-bezier(.2,.8,.2,1) both; }
+    .page:not(.is-locked) .lock-card { display: none; }
+    .lock-icon { margin: 0 auto 18px; font-size: 54px; animation: heart-float 3.4s ease-in-out infinite; }
+    .lock-title { margin: 0 0 12px; color: var(--ink); font-size: clamp(28px, 6vw, 42px); letter-spacing: -.06em; }
+    .lock-copy { margin: 0 auto 22px; color: var(--muted); font-size: 15px; line-height: 1.8; }
+    .key-form { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .key-input { width: min(100%, 260px); padding: 14px 18px; border: 1px solid rgba(233,73,126,.2); border-radius: 99px; outline: none; color: var(--ink); background: rgba(255,255,255,.9); text-align: center; font-size: 20px; font-weight: 800; letter-spacing: .28em; transition: border-color .2s ease, box-shadow .2s ease; }
+    .key-input:focus { border-color: var(--pink); box-shadow: 0 0 0 4px rgba(255,111,159,.15); }
+    .key-input.is-wrong { animation: shake .35s ease; border-color: #e9497e; }
+    .key-button { width: min(100%, 260px); padding: 14px 22px; border: 0; border-radius: 99px; color: #fff; background: linear-gradient(135deg, #ff8eb5, #ee4e88); box-shadow: 0 12px 24px rgba(233,73,126,.24); cursor: pointer; font-size: 15px; font-weight: 800; letter-spacing: .08em; }
+    .key-error { min-height: 20px; margin: 0; color: var(--deep-pink); font-size: 12px; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @keyframes card-in { from { opacity: 0; transform: translateY(22px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes success-in { from { opacity: 0; transform: scale(.8) translateY(16px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    @keyframes heart-float { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-8px) rotate(4deg); } }
+    @keyframes heart-beat { 0%,100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1); } }
+    @keyframes twinkle { 0%,100% { opacity: .25; transform: scale(.7) rotate(0); } 50% { opacity: 1; transform: scale(1.25) rotate(18deg); } }
+
+    @media (max-width: 480px) {
+      .page { padding: 18px 13px; }
+      .choice-area { min-height: 118px; gap: 9px; }
+      .choice { min-width: 0; padding: 13px 17px; font-size: 14px; }
+      .footer-note { margin-top: 21px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page is-locked" id="pageRoot">
+    <div class="sparkles" aria-hidden="true"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>·</span></div>
+
+    <section class="lock-card" id="lockCard" aria-labelledby="lockTitle">
+      <div class="lock-icon" aria-hidden="true">💌</div>
+      <div class="date-pill">PRIVATE INVITATION</div>
+      <h1 class="lock-title" id="lockTitle">这是一份秘密邀请</h1>
+      <p class="lock-copy">请输入专属于你的密钥，<br />才能打开这份小小的浪漫。</p>
+      <form class="key-form" id="keyForm">
+        <label class="sr-only" for="keyInput">请输入密钥</label>
+        <input class="key-input" id="keyInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="· · · ·" aria-describedby="keyError" required />
+        <button class="key-button" type="submit">打开邀请函</button>
+        <p class="key-error" id="keyError" role="alert"></p>
+      </form>
+    </section>
+
+
+    <section class="invite-card" id="inviteCard" aria-live="polite">
+      <div class="invite-content">
+        <div class="date-pill">DATE INVITATION</div>
+        <div class="heart" aria-hidden="true">♡</div>
+        <h1>宇宙第一可爱的<br /><em>6+1 小姐</em></h1>
+        <p class="subtitle">我们 10 月 23 号见面吧？<br />有一份超可爱的约会邀请，正在等你签收。</p>
+
+        <div class="choice-area" id="choiceArea">
+          <button class="choice choice-yes" id="yesButton" type="button">可以</button>
+          <button class="choice choice-must" id="mustButton" type="button" aria-label="必须可以，点击进入下一页">必须可以</button>
+        </div>
+        <p class="hint" id="hint">请认真考虑一下下下～</p>
+        <p class="footer-note">♡ 这是一份只对你生效的邀请函 ♡</p>
+      </div>
+
+      <section class="flow-page active" id="schedulePage" aria-labelledby="scheduleTitle">
+        <p class="flow-kicker">STEP 01 · DATE PLAN</p>
+        <h2 class="flow-title" id="scheduleTitle">那我几点去接你呀？</h2>
+        <p class="flow-copy">请选择一个你喜欢的时间，我会准时出现～</p>
+        <div class="option-grid" role="group" aria-label="接送时间">
+          <button class="time-option" type="button" data-time="15:00">15:00</button>
+          <button class="time-option" type="button" data-time="15:30">15:30</button>
+          <button class="time-option" type="button" data-time="16:00">16:00</button>
+          <button class="time-option" type="button" data-time="16:30">16:30</button>
+        </div>
+        <p class="selected-time" id="selectedTime" hidden>还没有选好时间哦</p>
+        <button class="flow-button" id="toActivities" type="button" disabled>选好啦，继续</button>
+      </section>
+
+      <section class="flow-page" id="activitiesPage" aria-labelledby="activitiesTitle">
+        <p class="flow-kicker">STEP 02 · DATE MENU</p>
+        <h2 class="flow-title" id="activitiesTitle">今天想干什么呀？</h2>
+        <p class="flow-copy">可以多选哦，想做的事情全部告诉我～</p>
+        <div class="activity-grid" role="group" aria-label="活动选择">
+          <label class="activity-option"><input type="checkbox" value="吃美食" /><span class="check">✓</span><span>吃美食</span></label>
+          <label class="activity-option"><input type="checkbox" value="看电影" /><span class="check">✓</span><span>看电影</span></label>
+          <label class="activity-option"><input type="checkbox" value="逛街散步" /><span class="check">✓</span><span>逛街散步</span></label>
+          <label class="activity-option"><input type="checkbox" value="拍照打卡" /><span class="check">✓</span><span>拍照打卡</span></label>
+          <label class="activity-option"><input type="checkbox" value="喝咖啡聊天" /><span class="check">✓</span><span>喝咖啡聊天</span></label>
+          <label class="activity-option"><input type="checkbox" value="去游乐园" /><span class="check">✓</span><span>去游乐园</span></label>
+        </div>
+        <button class="flow-button" id="submitActivities" type="button" disabled>提交我的愿望</button>
+      </section>
+
+      <section class="flow-page" id="promisePage" aria-labelledby="promiseTitle">
+        <div class="success-heart" aria-hidden="true">💗</div>
+        <p class="flow-kicker">DATE PROMISE</p>
+        <h2 class="flow-title" id="promiseTitle">小孩子才做选择，<br />你想干嘛都陪你去哇！</h2>
+        <p class="flow-copy">时间已经记下啦，愿望也全部收到啦。<br />这一天，你想怎么玩都由你决定。</p>
+        <button class="flow-button" type="button" data-next="surprisePage">继续期待</button>
+      </section>
+
+      <section class="flow-page" id="surprisePage" aria-labelledby="surpriseTitle">
+        <div class="success-heart" aria-hidden="true">🎁</div>
+        <p class="flow-kicker">A LITTLE SECRET</p>
+        <h2 class="flow-title" id="surpriseTitle">会有一个小惊喜<br />在哪等你呢？</h2>
+        <p class="flow-copy">先保密一下下～<br />等 10 月 23 号见面的时候，就知道啦。</p>
+        <button class="flow-button" type="button" data-next="finalPage">继续</button>
+      </section>
+
+      <section class="flow-page" id="finalPage" aria-labelledby="finalTitle">
+        <div class="final-heart" aria-hidden="true">💞</div>
+        <p class="flow-kicker">FOR YOU, ALWAYS</p>
+        <h2 class="flow-title final-title" id="finalTitle">每天都在想你哦</h2>
+        <p class="flow-copy final-copy">所以我们 10 月 23 号见。<br />我会带着喜欢、期待，还有一点点小惊喜去找你。</p>
+        <div class="success-date">10 · 23　♡　不见不散</div>
+        <p class="footer-note">♡ 宇宙第一可爱的 6+1 小姐，晚点见 ♡</p>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const card = document.getElementById('inviteCard');
+    const yesButton = document.getElementById('yesButton');
+    const pageRoot = document.getElementById('pageRoot');
+    const keyForm = document.getElementById('keyForm');
+    const keyInput = document.getElementById('keyInput');
+    const keyError = document.getElementById('keyError');
+
+    keyForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (keyInput.value === '2727') {
+        pageRoot.classList.remove('is-locked');
+        keyError.textContent = '';
+        keyInput.value = '';
+        document.getElementById('yesButton').focus();
+      } else {
+        keyError.textContent = '密钥不对哦，再想想～';
+        keyInput.classList.remove('is-wrong');
+        void keyInput.offsetWidth;
+        keyInput.classList.add('is-wrong');
+        keyInput.select();
+      }
+    });
+
+    const mustButton = document.getElementById('mustButton');
+    const hint = document.getElementById('hint');
+    const timeButtons = [...document.querySelectorAll('.time-option')];
+    const activityOptions = [...document.querySelectorAll('.activity-option')];
+    const toActivities = document.getElementById('toActivities');
+    const submitActivities = document.getElementById('submitActivities');
+    const storageKey = 'date-invite-latest-time';
+    let mustScale = 1;
+    let yesClicks = 0;
+    let chosenTime = '';
+    const hints = [
+      '请认真考虑一下下下～',
+      '“可以”已经很棒了，但还可以更坚定一点！',
+      '必须可以正在努力长大……',
+      '嗯？这个按钮怎么越来越大了？',
+      '好啦好啦，答案只能是必须可以 ♡'
+    ];
+
+    function showPage(pageId) {
+      document.querySelectorAll('.flow-page').forEach((page) => page.classList.toggle('active', page.id === pageId));
+      card.classList.add('is-flow');
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    yesButton.addEventListener('click', () => {
+      yesClicks += 1;
+      mustScale = Math.min(1 + yesClicks * .24, 3.85);
+      mustButton.style.setProperty('--must-scale', mustScale);
+      mustButton.style.transform = `scale(${mustScale})`;
+      hint.textContent = hints[Math.min(yesClicks, hints.length - 1)];
+      if (mustScale >= 2.6) hint.style.opacity = '.7';
+    });
+
+    mustButton.addEventListener('click', () => showPage('schedulePage'));
+
+    timeButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        timeButtons.forEach((item) => item.classList.remove('selected'));
+        button.classList.add('selected');
+        localStorage.setItem(storageKey, chosenTime);
+        selectedTime.hidden = false;
+        selectedTime.textContent = `好耶！${chosenTime} 去接你`;
+        toActivities.disabled = false;
+      });
+    });
+
+    toActivities.addEventListener('click', () => showPage('activitiesPage'));
+
+    activityOptions.forEach((option) => {
+      const checkbox = option.querySelector('input');
+      checkbox.addEventListener('change', () => {
+        option.classList.toggle('selected', checkbox.checked);
+        submitActivities.disabled = !activityOptions.some((item) => item.querySelector('input').checked);
+      });
+    });
+
+    submitActivities.addEventListener('click', () => showPage('promisePage'));
+    document.querySelectorAll('[data-next]').forEach((button) => {
+      button.addEventListener('click', () => showPage(button.dataset.next));
+    });
+  </script>
+</body>
+</html>
