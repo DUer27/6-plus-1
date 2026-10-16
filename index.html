@@ -419,7 +419,8 @@
     const activityOptions = [...document.querySelectorAll('.activity-option')];
     const toActivities = document.getElementById('toActivities');
     const submitActivities = document.getElementById('submitActivities');
-    const storageKey = 'date-invite-latest-time';
+    const selectedTime = document.getElementById('selectedTime');
+    const apiUrl = '/api/time';
     let mustScale = 1;
     let yesClicks = 0;
     let chosenTime = '';
@@ -449,13 +450,24 @@
     mustButton.addEventListener('click', () => showPage('schedulePage'));
 
     timeButtons.forEach((button) => {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', async () => {
         timeButtons.forEach((item) => item.classList.remove('selected'));
         button.classList.add('selected');
-        localStorage.setItem(storageKey, chosenTime);
+        chosenTime = button.dataset.time;
         selectedTime.hidden = false;
         selectedTime.textContent = `好耶！${chosenTime} 去接你`;
         toActivities.disabled = false;
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ time: chosenTime })
+          });
+          if (!response.ok) throw new Error('save failed');
+        } catch (error) {
+          selectedTime.textContent = '时间暂时没保存成功，请再点一次～';
+          toActivities.disabled = true;
+        }
       });
     });
 
